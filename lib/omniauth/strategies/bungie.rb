@@ -1,4 +1,7 @@
+require 'omniauth'
 require 'omniauth-oauth2'
+require 'socket'
+require 'timeout'
 
 module OmniAuth
   module Strategies
@@ -35,7 +38,8 @@ module OmniAuth
           self.access_token = build_access_token
           self.access_token = access_token.refresh!(token_params) if access_token.expired?
 
-          super
+          env['omniauth.auth'] = auth_hash
+          call_app!
         end
       rescue ::OAuth2::Error, CallbackError => e
         fail!(:invalid_credentials, e)
@@ -60,6 +64,7 @@ module OmniAuth
       def token_params
         token_params = options.token_params.merge(options_for("token"))
 
+        token_params[:headers] ||= {}
         token_params[:headers]['X-Api-Key'] = options.api_key
         token_params[:headers]['Origin'] = origin unless options.origin.nil?
 
@@ -85,7 +90,10 @@ module OmniAuth
       def raw_info
         return @raw_info unless @raw_info.nil?
 
-        @raw_info = access_token.get('/Platform/User/GetCurrentBungieAccount/', token_params).parsed
+        @raw_info = access_token.get(
+          '/Platform/User/GetCurrentBungieAccount/',
+          token_params
+        ).parsed
 
         @raw_info = @raw_info.dig('Response')
       end

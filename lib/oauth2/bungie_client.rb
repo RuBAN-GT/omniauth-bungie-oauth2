@@ -4,7 +4,7 @@ module OAuth2
       opts = options.dup
       @id = client_id
       @secret = client_secret
-      @site = opts.delete(:site)
+      @site = 'https://www.bungie.net'
       ssl = opts.delete(:ssl)
       @options = {
         :authorize_url     => 'https://www.bungie.net',
@@ -38,7 +38,7 @@ module OAuth2
 
       raise(error) if options[:raise_errors] && !(response.is_a?(Hash) && response['access_token'])
 
-      access_token_class.from_hash(self, response.parsed.merge(access_token_opts))
+      access_token_class.from_hash(self, response.merge(access_token_opts))
     end
 
     def get_token_with_refresh(params, access_token_opts = {}, access_token_class = BungieAccessToken)
@@ -65,9 +65,10 @@ module OAuth2
 
       raise(error) if options[:raise_errors] && !(response.is_a?(Hash) && response['access_token'])
 
-      access_token_class.from_hash(self, response.parsed.merge(access_token_opts))
+      access_token_class.from_hash(self, response.merge(access_token_opts))
     end
 
+    # Transform response body to RFC specification
     def get_normalized_response(response)
       response = response.parsed
 
@@ -75,11 +76,11 @@ module OAuth2
 
       if response['ErrorCode'] == 1 && !response.dig('Response', 'accessToken').nil?
         {
-          :access_token => response.dig('Response', 'accessToken', 'value'),
-          :token_type => 'Bearer',
-          :expires_in => response.dig('Response', 'accessToken', 'expires'),
-          :refresh_token => response.dig('Response', 'refreshToken', 'value'),
-          :refresh_expries_in => response.dig('Response', 'refreshToken', 'expires')
+          'access_token' => response.dig('Response', 'accessToken', 'value'),
+          'token_type' => 'Bearer',
+          'expires_in' => response.dig('Response', 'accessToken', 'expires'),
+          'refresh_token' => response.dig('Response', 'refreshToken', 'value'),
+          'refresh_expries_in' => response.dig('Response', 'refreshToken', 'expires')
         }
       else
         response

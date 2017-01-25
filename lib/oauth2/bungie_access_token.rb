@@ -1,5 +1,6 @@
 module OAuth2
   class BungieAccessToken < AccessToken
+    # Updated refreshing method for a special bungie page
     def refresh!(params = {})
       raise('A refresh_token is not available') unless refresh_token
 
