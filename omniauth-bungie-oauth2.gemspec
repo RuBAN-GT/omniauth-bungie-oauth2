@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = 'https://github.com/RuBAN-GT/omniauth-bungie-oauth2'
   spec.license       = 'MIT'
 
-  spec.files         = `git ls-files`.split('\n')
+  spec.files         = `git ls-files`.split("\n")
   spec.require_paths = ['lib']
 
   spec.add_development_dependency 'bundler', '~> 1.13'
