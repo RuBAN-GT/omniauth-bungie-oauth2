@@ -1,6 +1,7 @@
 # Omniauth::Bungie::Oauth2
 
 [![Gem Version](https://badge.fury.io/rb/omniauth-bungie-oauth2.svg)](https://badge.fury.io/rb/omniauth-bungie-oauth2)
+[![Build Status](https://travis-ci.org/RuBAN-GT/omniauth-bungie-oauth2.svg?branch=master)](https://travis-ci.org/RuBAN-GT/omniauth-bungie-oauth2)
 
 A Bungie OAuth2 strategy for Omniauth.
 
