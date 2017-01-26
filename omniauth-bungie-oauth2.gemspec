@@ -5,7 +5,7 @@ require 'omniauth-bungie-oauth2/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'omniauth-bungie-oauth2'
-  spec.version       = Omniauth::BungieOauth2::VERSION
+  spec.version       = OmniAuth::BungieOauth2::VERSION
   spec.authors       = ['Dmitry Ruban']
   spec.email         = ['dkruban@gmail.com']
 
