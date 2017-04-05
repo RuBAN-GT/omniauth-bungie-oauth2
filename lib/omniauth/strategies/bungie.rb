@@ -26,6 +26,13 @@ module OmniAuth
         end
       end
 
+      def merge_stack(stack)
+        stack.inject({}) do |a, e|
+          a.merge!(e) unless e.nil?
+          a
+        end
+      end
+
       # Updated callback phase with new refreshing
       def callback_phase
         error = request.params["error_reason"] || request.params["error"]
@@ -39,6 +46,7 @@ module OmniAuth
           self.access_token = access_token.refresh!(token_params) if access_token.expired?
 
           env['omniauth.auth'] = auth_hash
+
           call_app!
         end
       rescue ::OAuth2::Error, CallbackError => e
@@ -74,13 +82,22 @@ module OmniAuth
       # Get important data
       uid { raw_info.dig('bungieNetUser', 'membershipId') }
       info do
-        destiny = raw_info['destinyAccounts']&.first
+        if raw_info['destinyAccounts'].any?
+          destiny = raw_info['destinyAccounts'].first
+          {
+            :membership_id => destiny.dig('userInfo', 'membershipId'),
+            :membership_type => destiny.dig('userInfo', 'membershipType'),
+            :display_name => destiny.dig('userInfo', 'displayName')
+          }
+        else
+          destiny = raw_info['bungieNetUser']
 
-        {
-          :membership_id => destiny.dig('userInfo', 'membershipId'),
-          :membership_type => destiny.dig('userInfo', 'membershipType'),
-          :display_name => destiny.dig('userInfo', 'displayName')
-        } unless destiny.nil?
+          {
+            :membership_id => destiny['membershipId'],
+            :membership_type => 254,
+            :display_name => destiny['displayName']
+          }
+        end
       end
       extra do
         {
