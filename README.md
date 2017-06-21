@@ -85,6 +85,27 @@ class Devise::OmniauthCallbacksController < Devise::OmniauthCallbacksController
 end
 ~~~~
 
+Now You should define `from_omniauth` method in your `User` model:
+
+~~~~ruby
+def self.from_omniauth(auth)
+  where(:uid => auth.uid).first_or_create do |user|
+    user.membership_id = auth.info.membership_id
+    user.membership_type = auth.info.membership_type
+    user.display_name = auth.info.display_name
+  end
+end
+~~~~
+
+This model uses the next migration fields:
+
+~~~~ruby
+t.string :uid, :null => false, :index => true
+t.string :membership_id, :null => false, :index => true
+t.string :membership_type, :null => false, :default => '2'
+t.string :display_name, :null => false
+~~~~
+
 ### Result
 
 After all manipulation the `request.env["omniauth.auth"]` have the next fields:
