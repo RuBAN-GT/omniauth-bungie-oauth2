@@ -36,7 +36,7 @@ module OAuth2
 
       response = get_normalized_response(response)
 
-      raise(error) if options[:raise_errors] && !(response.is_a?(Hash) && response['access_token'])
+      raise(error) if options[:raise_errors] && (!response.is_a?(Hash) || response['access_token'].nil?)
 
       access_token_class.from_hash(self, response.merge(access_token_opts))
     end

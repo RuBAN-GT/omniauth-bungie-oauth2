@@ -19,7 +19,9 @@ And then execute:
 
 ## Usage
 
-For full usage this gem You must create an application on [Bungie.net](https://www.bungie.net/en/application).
+### Settings
+
+For full usage this gem You must create an application with authentication access on [Bungie.net](https://www.bungie.net/en/application).
 
 After this, you can integrate this strategy with your application. (More about A Bungie OAuth2 you can read on [Help page](https://www.bungie.net/en/Help/Article/45481))
 
@@ -33,6 +35,57 @@ config.middleware.use OmniAuth::Builder do
     :origin => 'origin_url_if_you_need'
 end
 ~~~~
+
+### Rails integration
+
+For integration with Rails You have to setup your strategy configuration in `config/initializers/devise.rb`:
+
+~~~~ruby
+Devise.setup do |config|
+  config.omniauth :bungie,
+    'x_api_key_from_bungie_app_settings',
+    'authorization_url_from_bungie_app_settings',
+    :origin => 'origin_url_if_you_need'
+end
+~~~~
+
+After this You should define omniauth callback in routes and controller.
+
+**routes.rb:**
+
+~~~~ruby
+devise_for :users, :controllers => {
+  :omniauth_callbacks => 'devise/omniauth_callbacks',
+}
+~~~~
+
+**devise/omniauth_callbacks_controller.rb**
+
+~~~~ruby
+class Devise::OmniauthCallbacksController < Devise::OmniauthCallbacksController
+  def bungie
+    @user = User.from_omniauth(request.env["omniauth.auth"])
+
+    if @user.persisted?
+      @user.remember_me = true
+
+      sign_in_and_redirect @user, :event => :authentication
+
+      set_flash_message(:notice, :success, :kind => 'Bungie') if is_navigational_format?
+    else
+      session["devise.bungie_data"] = request.env["omniauth.auth"]
+
+      redirect_to '/'
+    end
+  end
+
+  def failure
+    redirect_to '/'
+  end
+end
+~~~~
+
+### Result
 
 After all manipulation the `request.env["omniauth.auth"]` have the next fields:
 
