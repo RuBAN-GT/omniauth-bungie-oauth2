@@ -27,24 +27,24 @@ module OmniAuth
       end
 
       uid do
-        raw_info['id']
+        raw_info['membershipId']
       end
 
       info do
         {
           :membership_id => raw_info['membershipId'],
-          :unique_name => raw_info['uniqueName']
+          :unique_name => raw_info['uniqueName'],
+          :display_name => raw_info['displayName']
         }
       end
 
-      extra do
-        {
-          'raw_info' => raw_info
-        }
-      end
+      extra { raw_info }
 
       def raw_info
-        @raw_info ||= access_token.get('/Platform/User/GetCurrentBungieNetUser/').parsed
+        return @raw_info unless @raw_info.nil?
+
+        @raw_info = access_token.get('/Platform/User/GetCurrentBungieNetUser/').parsed
+        @raw_info = (@raw_info['ErrorCode'] == 1) ? @raw_info['Response'] : {}
       end
     end
   end
