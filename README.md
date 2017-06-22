@@ -9,9 +9,9 @@ A Bungie OAuth2 strategy for Omniauth.
 
 Add this line to your application's Gemfile:
 
-```ruby
+~~~~ruby
 gem 'omniauth-bungie-oauth2'
-```
+~~~~
 
 And then execute:
 
@@ -21,20 +21,17 @@ And then execute:
 
 ### Settings
 
-For full usage this gem You must create an application with authentication access on [Bungie.net](https://www.bungie.net/en/application).
+For usage this gem You must create an application with authentication access on [Bungie.net](https://www.bungie.net/en/application).
+You should set **Confidential** value in the `OAuth Client Type` field.
 
 After this, you can integrate this strategy with your application. (More about A Bungie OAuth2 you can read on [Help page](https://www.bungie.net/en/Help/Article/45481))
 
-For example, you can add the middleware to a Rails application in `/config/application.rb`:
+**This provider uses four arguments:**
 
-~~~ruby
-config.middleware.use OmniAuth::Builder do
-  provider :bungie,
-    'x_api_key_from_bungie_app_settings',
-    'authorization_url_from_bungie_app_settings',
-    :origin => 'origin_url_if_you_need'
-end
-~~~~
+* `client_id` - OAuth client_id,
+* `client_secret` - OAuth client_secret,
+* `x_api_key` - API Key,
+* `redirect_uri` - Redirect URL.
 
 ### Rails integration
 
@@ -43,11 +40,14 @@ For integration with Rails You have to setup your strategy configuration in `con
 ~~~~ruby
 Devise.setup do |config|
   config.omniauth :bungie,
-    'x_api_key_from_bungie_app_settings',
-    'authorization_url_from_bungie_app_settings',
-    :origin => 'origin_url_if_you_need'
+    'client_id',
+    'client_secret',
+    'x_api_key',
+    'redirect_url'
 end
 ~~~~
+
+> You can also define it in initializers with `config.middleware.use OmniAuth::Builder`.
 
 After this You should define omniauth callback in routes and controller.
 
@@ -78,10 +78,6 @@ class Devise::OmniauthCallbacksController < Devise::OmniauthCallbacksController
       redirect_to '/'
     end
   end
-
-  def failure
-    redirect_to '/'
-  end
 end
 ~~~~
 
@@ -91,36 +87,21 @@ Now You should define `from_omniauth` method in your `User` model:
 def self.from_omniauth(auth)
   where(:uid => auth.uid).first_or_create do |user|
     user.membership_id = auth.info.membership_id
-    user.membership_type = auth.info.membership_type
-    user.display_name = auth.info.display_name
+    user.display_name  = auth.info.display_name
+    user.unique_name   = auth.info.unique_name
   end
 end
 ~~~~
 
-This model uses the next migration fields:
-
-~~~~ruby
-t.string :uid, :null => false, :index => true
-t.string :membership_id, :null => false, :index => true
-t.string :membership_type, :null => false, :default => '2'
-t.string :display_name, :null => false
-~~~~
+> Do not forget to specify model fields in your migration.
 
 ### Result
 
 After all manipulation the `request.env["omniauth.auth"]` have the next fields:
 
 * `uid` with BungieNetUser membershipId
-* `info` with Destiny membershipId, membershipType and displayName
-* `extra` with [GetBungieAccount](https://destinydevs.github.io/BungieNetPlatform/docs/UserService/GetBungieAccount) result
-
-## Configuration
-
-This provider require two arguments and have one special option:
-
-* `api_key` - X-Api-Key for Bungie API;
-* `auth_url` - Autherization url;
-* `origin` - Origin url;
+* `info` with membershipId, uniqueName, displayName
+* `extra` with [GetCurrentBungieNetUser](https://destinydevs.github.io/BungieNetPlatform/docs/UserService/GetCurrentBungieNetUser) result
 
 ## Contributing
 
