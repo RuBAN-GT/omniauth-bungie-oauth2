@@ -23,9 +23,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec', '~> 3.0'
 
-  spec.add_runtime_dependency 'faraday', '~> 0.9'
-  spec.add_runtime_dependency 'faraday_middleware', '~> 0'
-  spec.add_runtime_dependency 'oauth2', '~> 1.2', '>= 1.2.0'
-  spec.add_runtime_dependency 'omniauth', '~> 1.3', '>= 1.3.1'
   spec.add_runtime_dependency 'omniauth-oauth2', '~> 1.4', '>= 1.4.0'
 end
