@@ -27,14 +27,16 @@ module OmniAuth
       end
 
       uid do
-        raw_info['membershipId']
+        raw_info.dig('bungieNetUser', 'membershipId')
       end
 
       info do
+        info = raw_info['bungieNetUser'] || {}
+
         {
-          :membership_id => raw_info['membershipId'],
-          :unique_name => raw_info['uniqueName'],
-          :display_name => raw_info['displayName']
+          :membership_id => info['membershipId'],
+          :unique_name   => info['uniqueName'],
+          :display_name  => info['displayName']
         }
       end
 
@@ -43,7 +45,7 @@ module OmniAuth
       def raw_info
         return @raw_info unless @raw_info.nil?
 
-        @raw_info = access_token.get('/Platform/User/GetCurrentBungieNetUser/').parsed
+        @raw_info = access_token.get('/Platform/User/GetMembershipsForCurrentUser/').parsed
         @raw_info = (@raw_info['ErrorCode'] == 1) ? @raw_info['Response'] : {}
       end
     end

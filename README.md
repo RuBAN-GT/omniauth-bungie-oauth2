@@ -101,7 +101,7 @@ After all manipulation the `request.env["omniauth.auth"]` have the next fields:
 
 * `uid` with BungieNetUser membershipId
 * `info` with membershipId, uniqueName, displayName
-* `extra` with [GetCurrentBungieNetUser](https://destinydevs.github.io/BungieNetPlatform/docs/UserService/GetCurrentBungieNetUser) result
+* `extra` with [GetMembershipDataForCurrentUser](https://destinydevs.github.io/BungieNetPlatform/docs/UserService/GetMembershipDataForCurrentUser) result
 
 ## Contributing
 
